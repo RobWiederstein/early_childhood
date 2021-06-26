@@ -1,0 +1,51 @@
+---
+title: "Indiana Early Childhood"
+output: 
+  flexdashboard::flex_dashboard:
+    theme: cosmo
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(magrittr)
+library(dplyr)
+# Install thematic and un-comment for themed static plots (i.e., ggplot2)
+# thematic::thematic_rmd()
+```
+
+```{r load-data}
+input <- "https://dl.dropbox.com/s/v8uef97q73zwq1j/2021-06-25-maternal-infant-health.csv?dl=0"
+df <- data.table::fread(input = input)
+# prepare data
+rownames(df) <- df$location
+df.1 <- df %>% select(-location)
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Birth Outcomes
+
+```{r heatmap}
+library(heatmaply)
+heatmaply(df.1, scale = "column")
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Table
+
+```{r table}
+row.names(df) <- NULL
+DT::datatable(df, extensions = 'FixedColumns',
+  options = list(
+    dom = 't',
+    scrollX = TRUE,
+    fixedColumns = list(leftColumns = 2)
+  )) %>%
+  DT::formatStyle(columns = 1:12, style = "table-condensed")
+```
+
