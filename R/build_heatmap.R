@@ -11,10 +11,9 @@ df <- df %>% select(-location)
 #?dendextend::color_branches
 heatmaply_cor(
         cor(df),
-        xlab = "Features",
-        ylab = "Features",
-        k_col = 2,
-        k_row = 2
+        k_col = 3,
+        k_row = 3
 )
 # 5.0 heatmaply
-heatmaply(df, scale = "column")
+m <- heatmaply(df, scale = "column", k_row = 3, k_col = 3)
+save(m, file = "heatmap.Rdata")

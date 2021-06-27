@@ -2,9 +2,10 @@
 title: "Indiana Early Childhood"
 output: 
   flexdashboard::flex_dashboard:
-    theme: cosmo
+    theme: cerulean
     orientation: columns
     vertical_layout: fill
+    source_code: embed
 ---
 
 ```{r setup, include=FALSE}
@@ -23,29 +24,43 @@ rownames(df) <- df$location
 df.1 <- df %>% select(-location)
 ```
 
-Column {data-width=500}
------------------------------------------------------------------------
+# Maternal Health {data-icon="fa-table"}
+
+## Column {data-width=500}
 
 ### Birth Outcomes
 
+
 ```{r heatmap}
-library(heatmaply)
-heatmaply(df.1, scale = "column")
+load("./heatmap.Rdata")
+m
 ```
 
-Column {data-width=500}
------------------------------------------------------------------------
+## Column {data-width=500}
 
-### Table
+### Top 20 Indiana Counties by Live Births
 
 ```{r table}
+library(DT)
 row.names(df) <- NULL
-DT::datatable(df, extensions = 'FixedColumns',
+DT::datatable(df, 
+              extensions = 'FixedColumns',
+              class = 'compact stripe',
+              rownames = F,
   options = list(
+    pageLength = 20,
     dom = 't',
     scrollX = TRUE,
-    fixedColumns = list(leftColumns = 2)
-  )) %>%
-  DT::formatStyle(columns = 1:12, style = "table-condensed")
+    fixedColumns = list(leftColumns = 1)
+  )) %>% 
+  formatPercentage(columns = c(2:13), digits = 1)
 ```
+### Infant Mortality {data-height=100}
 
+Indiana reported 525 infant deaths in 2019.  According to the CDC [website](https://www.cdc.gov/reproductivehealth/maternalinfanthealth/infantmortality.htm), Indiana's infant mortality rate was 6.53 deaths per 1,000 live births, ranking Indiana 14th highest in the country by state. Infant mortality is the death of a child prior to his or her first birthday.
+
+# Pre School
+
+# Notes
+
+Hello World!

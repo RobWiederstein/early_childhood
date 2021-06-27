@@ -121,5 +121,16 @@ unmarried <- function(){
         df.1
 }
 
+infant_deaths <- function(){
+        path <- "./data/raw/infant_deaths.xlsx"
+        col_types <- c("text", "text", "numeric", "text", "numeric")
+        df <- readxl::read_xlsx(path = path, col_types = col_types)
+        names(df) <- janitor::make_clean_names(names(df))
+        df.1 <- df %>% dplyr::filter(time_frame == max(time_frame) &
+                                             location_type == "County"
+        )
+        df.1$variable <- "infant_deaths"
+        df.1
+}
 
 
