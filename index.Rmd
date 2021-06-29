@@ -1,12 +1,29 @@
 ---
 title: "Indiana Early Childhood"
-output: 
+output:
   flexdashboard::flex_dashboard:
     theme: cerulean
     orientation: columns
     vertical_layout: fill
     source_code: embed
 ---
+<style type="text/css">
+
+.chart-title {  /* chart_title  */
+   font-size: 18px;
+   font-family: Algerian;
+}
+   
+.nav-tabs-custom .nav-tabs li.active a {
+  font-size: 18px;
+   font-family: Algerian;
+}
+
+.nav-tabs-custom .nav-tabs li:not(.active) a {
+  font-size: 18px;
+   font-family: Algerian;
+}
+</style>
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
@@ -24,23 +41,29 @@ rownames(df) <- df$location
 df.1 <- df %>% select(-location)
 ```
 
-# Maternal Health {data-icon="fa-table"}
+# Maternal Health {data-icon="fas fa-child"}
 
-## Column {data-width=500}
+## Column {data-width=600}{.tabset}
 
-### Birth Outcomes
+### Heatmap
 
-
-```{r heatmap}
-load("./heatmap.Rdata")
-m
+```{r heatmap-maternal-health}
+load("./data/tidy/hm_mh.Rdata")
+hm_mh
 ```
 
-## Column {data-width=500}
+### Correlogram
+
+```{r correlogram-maternal-health}
+load("./data/tidy/cg_mh.Rdata")
+cg_mh
+```
+
+## Column {data-width=400}
 
 ### Top 20 Indiana Counties by Live Births
 
-```{r table}
+```{r table-maternal-health}
 library(DT)
 row.names(df) <- NULL
 DT::datatable(df, 
@@ -55,12 +78,94 @@ DT::datatable(df,
   )) %>% 
   formatPercentage(columns = c(2:13), digits = 1)
 ```
-### Infant Mortality {data-height=100}
+### Tip {data-height=150}
 
-Indiana reported 525 infant deaths in 2019.  According to the CDC [website](https://www.cdc.gov/reproductivehealth/maternalinfanthealth/infantmortality.htm), Indiana's infant mortality rate was 6.53 deaths per 1,000 live births, ranking Indiana 14th highest in the country by state. Infant mortality is the death of a child prior to his or her first birthday.
+The "Heatmap" shows the variation among Indiana's top counties by live births. The comparisons are by column. Look for the bright yellows and dark blues within a single column.  Also, look to see how the algorithm grouped the counties and variables with the dendrogram in the margins.
 
-# Pre School
+The "Correlogram" is a correlation matrix showing the relationship between the numeric variables.
 
-# Notes
 
-Hello World!
+# Early Childhood {data-icon="fas fa-school"}
+
+## Column {data-width=600}{.tabset}
+
+### Heatmap
+
+```{r heatmap-early-childhood}
+load("./data/tidy/hm_ec.Rdata")
+hm_ec
+```
+
+### Correlogram
+
+```{r correlogram-early-childhood}
+load("./data/tidy/cg_ec.Rdata")
+cg_ec
+```
+
+
+## Column {data-width=400}
+
+### Top 20 Indiana Counties by Children Age 0 to 4
+
+```{r table-early-childhood}
+file <- "./data/tidy/2021-06-28-in-early-childhood.csv"
+ec <- readr::read_csv(file = file)
+library(DT)
+row.names(ec) <- NULL
+DT::datatable(ec, 
+              extensions = 'FixedColumns',
+              class = 'compact stripe',
+              rownames = F,
+  options = list(
+    pageLength = 20,
+    dom = 't',
+    scrollX = TRUE,
+    fixedColumns = list(leftColumns = 1))) %>% 
+  formatRound(columns = 3:20, digits = 3)
+```
+### Tip {data-height=150}
+
+The "Heatmap" shows the variation among Indiana's top counties by children ages 0 to 4. The comparisons are by column. Look for the bright yellows and dark blues within a single column.  Also, look to see how the algorithm grouped the counties and variables with the dendrogram in the margins.
+
+The "Correlogram" is a correlation matrix showing the relationship between the numeric variables.
+The "correlogram" is a correlation matrix showing the relationship between the numeric variables.
+
+# Notes {data-icon="fas fa-pen"}
+
+## column
+
+### Data
+
+The data are from the Annie E. Casey Kids Count website for Indiana. More specifically, the data were downloaded from the sections labeled "birth outcomes" and "early childhood".
+
+### Technical
+
+The heatmap and correlogram were generated via the `heatmaply` package in R. From the vignette, a "heatmap is a popular graphical method for visualizing high-dimensional data, in which a table of numbers are encoded as a grid of colored cells. The rows and columns of the matrix are ordered to highlight patterns and are often accompanied by dendrograms. Heatmaps are used in many fields for visualizing observations, correlations, missing values patterns, and more."
+
+## column
+
+### Resources
+
+[Center for High Impact Philanthropy](https://www.impact.upenn.edu/early-childhood-toolkit/what-is-early-childhood/)
+
+[Heckman: The Economics of Human Potential](https://heckmanequation.org)
+
+[March of Dimes](https://www.marchofdimes.org)
+
+
+### Acknowledgements
+
+Thanks, recognition and acknowledgement are given to the following people and organizations:
+
+[Annie E. Casey Foundation](https://www.aecf.org)
+
+[Indiana Youth Institute](https://www.iyi.org)
+
+
+
+
+
+
+
+

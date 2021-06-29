@@ -7,13 +7,14 @@ df <- data.table::fread(input = input)
 rownames(df) <- df$location
 df <- df %>% select(-location)
 # 4.0 heatmaply_cor ----
-#vignette("heatmaply")
-#?dendextend::color_branches
-heatmaply_cor(
+cg_mh <- heatmaply_cor(
         cor(df),
         k_col = 3,
         k_row = 3
 )
+file <- "./data/tidy/cg_mh.Rdata"
+save(cg_mh, file = file)
 # 5.0 heatmaply
-m <- heatmaply(df, scale = "column", k_row = 3, k_col = 3)
-save(m, file = "heatmap.Rdata")
+hm_mh <- heatmaply(df, scale = "column", k_row = 3, k_col = 3)
+file <- "./data/tidy/hm_mh.Rdata"
+save(hm_mh, file = file)

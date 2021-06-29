@@ -1,4 +1,10 @@
-
+# 1.0 general functions ----
+convert_file_names <- function(path){
+        from <- list.files(path = path, full.names = T)
+        to <- from %>% gsub(" |, ", "_", .) %>% tolower
+        if(any(!file.exists(to))){file.rename(from = from, to = to)}
+}
+# 2.0 birth indicators ----
 breastfeeding <- function(){
         path <- "./data/raw/new_mothers_breastfeeding.xlsx"
         col_types <- c("text", "text", "numeric", "text", "numeric")
@@ -108,7 +114,6 @@ race_ethnic <- function(){
                              values_to = "data")
         df.3
 }
-
 unmarried <- function(){
         path <- "./data/raw/births_to_unmarried_parents.xlsx"
         col_types <- c("text", "text", "numeric", "text", "numeric")
@@ -120,7 +125,6 @@ unmarried <- function(){
         df.1$variable <- "unmarried"
         df.1
 }
-
 infant_deaths <- function(){
         path <- "./data/raw/infant_deaths.xlsx"
         col_types <- c("text", "text", "numeric", "text", "numeric")
@@ -132,5 +136,146 @@ infant_deaths <- function(){
         df.1$variable <- "infant_deaths"
         df.1
 }
+# 3.0 early childcare ----
+capacity_licensed_centers_homes <- function(){
+        path <- "./data/raw/ec/capacity_of_licensed_child_care_centers_and_homes.xlsx"
+        col_types <- c("text", "text", "numeric", "text", "numeric")
+        df <- readxl::read_xlsx(path = path, col_types = col_types)
+        names(df) <- janitor::make_clean_names(names(df))
+        df.1 <- df %>% dplyr::filter(time_frame == max(time_frame) &
+                                             location_type == "County"
+        )
+        df.1$variable <- "cap_lic_ctrs_homes"
+        df.1
+}
+child_care_facilities_by_type <- function(){
+        path <- "./data/raw/ec/child_care_facilities_by_type.xlsx"
+        df <- readxl::read_xlsx(path = path)
+        names(df) <- janitor::make_clean_names(names(df))
+        df.1 <- df %>%
+                mutate(time_frame = time_frame %>% as.integer,
+                       data = data %>% as.integer) %>%
+                dplyr::filter(time_frame == max(time_frame) &
+                                             location_type == "County"
+        ) %>%
+                rename(variable = child_care_facilities)
+}
+child_pop_0_to_4 <- function(){
+        path <- "./data/raw/ec/child_population_by_age_group.xlsx"
+        df <- readxl::read_xlsx(path = path)
+        names(df) <- janitor::make_clean_names(names(df))
+        df.1 <-
+                df %>%
+                dplyr::filter(age_group == "Ages 0-4") %>%
+                dplyr::filter(time_frame == max(as.integer(time_frame))) %>%
+                dplyr::filter(location_type == "County") %>%
+                dplyr::filter(data_format == "Number") %>%
+                rename(variable = age_group) %>%
+                mutate(time_frame = time_frame %>% as.integer,
+                       data = data %>% as.integer)
+        df.1
+}
+child_pop_race_ethnicity <- function(){
+        #https://bit.ly/3y28if1
+        path <- "./data/raw/ec/child_population_by_race_and_ethnicity.xlsx"
+        df <- readxl::read_xlsx(path = path)
+        names(df) <- janitor::make_clean_names(names(df))
+        df.1 <-
+                df %>%
+                dplyr::filter(time_frame == max(as.integer(time_frame))) %>%
+                dplyr::filter(location_type == "County") %>%
+                dplyr::filter(data_format == "Number") %>%
+                rename(variable = race) %>%
+                mutate(time_frame = time_frame %>% as.integer,
+                       data = data %>% as.integer)
+        #change variable names
+        df.1$variable <- gsub(" (of any race)", "", df.1$variable, fixed = T)
+        df.1$variable <- gsub("American Indian", "Am_Indian", df.1$variable)
+        df.1$variable <- gsub("Total", "total_child", df.1$variable)
+        df.1$variable <- tolower(df.1$variable)
+
+        df.1
+}
+children_receiving_child_care_vouchers <- function(){
+        path <- "./data/raw/ec/children_receiving_child_care_vouchers.xlsx"
+        df <- readxl::read_xlsx(path = path)
+        names(df) <- janitor::make_clean_names(names(df))
+        df.1 <-
+                df %>%
+                mutate(across(c(time_frame, data), as.integer)) %>%
+                dplyr::filter(time_frame == max(time_frame)) %>%
+                dplyr::filter(location_type == "County") %>%
+                mutate(variable = "child_care_vouchers")
+        df.1
+}
+children_served_by_first_steps <- function(){
+     path <- "./data/raw/ec/children_served_by_first_steps.xlsx"
+     df <- readxl::read_xlsx(path = path)
+     names(df) <- janitor::make_clean_names(names(df))
+     df.1 <-
+             df %>%
+             mutate(across(c(time_frame, data), as.integer)) %>%
+             dplyr::filter(time_frame == max(time_frame)) %>%
+             dplyr::filter(location_type == "County") %>%
+             mutate(variable = "first_steps")
+     df.1
+}
+head_start_slots <- function(){
+        path <- "./data/raw/ec/early_head_start_and_head_start_funded_enrollment_slots.xlsx"
+        df <- readxl::read_xlsx(path = path)
+        names(df) <- janitor::make_clean_names(names(df))
+        df.1 <-
+                df %>%
+                mutate(across(c(time_frame, data), as.integer)) %>%
+                dplyr::filter(time_frame == max(time_frame)) %>%
+                dplyr::filter(location_type == "County") %>%
+                dplyr::filter(head_start != "Total") %>%
+                rename(variable = head_start)
+        df.1
+}
+licensed_child_care_slots_per_100_child <- function(){
+        path <- "./data/raw/ec/licensed_child_care_slots_per_100_children_ages_0-5.xlsx"
+        df <- readxl::read_xlsx(path = path)
+        names(df) <- janitor::make_clean_names(names(df))
+        df.1 <-
+                df %>%
+                mutate(across(c(time_frame, data), as.integer)) %>%
+                dplyr::filter(time_frame == max(time_frame)) %>%
+                dplyr::filter(location_type == "County") %>%
+                mutate(data = divide_by(data, 100)) %>%
+                mutate(variable = "child_care_slots_0-5")
+        df.1
+}
+monthly_avg_children_on_waiting_list <- function(){
+        path <- "./data/raw/ec/monthly_average_number_of_children_on_waiting_list_for_child_care_vouchers.xlsx"
+        df <- readxl::read_xlsx(path = path)
+        names(df) <- janitor::make_clean_names(names(df))
+        df.1 <-
+                df %>%
+                mutate(across(c(time_frame, data), as.integer)) %>%
+                dplyr::filter(time_frame == max(time_frame)) %>%
+                dplyr::filter(location_type == "County") %>%
+                mutate(variable = "waiting_list")
+        df.1
+}
+wic_participants <- function(){
+        path <- "./data/raw/ec/women_infants_and_children_(wic)_participants.xlsx"
+        df <- readxl::read_xlsx(path = path)
+        names(df) <- janitor::make_clean_names(names(df))
+        df.1 <-
+                df %>%
+                mutate(across(c(time_frame, data), as.integer)) %>%
+                dplyr::filter(time_frame == max(time_frame)) %>%
+                dplyr::filter(location_type == "County") %>%
+                dplyr::filter(data_format == "Number") %>%
+                rename(variable = wic_category)
+        df.1$variable <- gsub("Total Participants", "total_part", df.1$variable)
+        df.1$variable <- paste("wic_", df.1$variable, sep = "")
+        df.1
+}
+
+
+
+
 
 
