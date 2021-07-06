@@ -53,7 +53,7 @@ df.3 <-
                cap_lic_ctrs_homes_per_cap:wic_total_part_per_tot
                )
 
-## 4.0 write out dataframe to data/tidy ----
+## 6.0 write out dataframe to data/tidy ----
 file <- "./data/tidy/2021-06-28-in-early-childhood.csv"
 write.csv(df.3, file = file, row.names = F)
 file <- "~/Dropbox/public/datasets/2021-06-28-in-early-childhood.csv"

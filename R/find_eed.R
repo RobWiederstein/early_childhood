@@ -4,8 +4,9 @@ names(df) <- janitor::make_clean_names(names(df))
 tail(df)
 df.1 <-
         df %>%
-        filter(condition == "Pregnancy and Delivery Care") %>%
-        drop_na(score) %>%
+        select(facility_id, measure_name:end_date) %>%
+        filter(measure_name == "Elective Delivery") %>%
+        drop_na(score) #%>%
         mutate(score = score %>% as.integer) %>%
         group_by(score) %>%
         tally()

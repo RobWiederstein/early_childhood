@@ -35,6 +35,19 @@ low_birth_weight <- function(){
         df.1$variable <- "low_birth_weight"
         df.1
 }
+very_low_birth_weight <- function(){
+        path <- "./data/raw/very_low_birth-weight_babies.xlsx"
+        df <- readxl::read_xlsx(path = path, na = "LNE")#, col_types = col_types)
+        names(df) <- janitor::make_clean_names(names(df))
+        df.1 <- df %>%
+                mutate(time_frame = time_frame %>% as.integer) %>%
+                mutate(data = data %>% as.numeric) %>%
+                dplyr::filter(time_frame == max(time_frame) &
+                                             location_type == "County")
+        df.1$variable <- "very_low_birth_weight"
+        df.1
+
+}
 medicaid_mothers <- function(){
         path <- "./data/raw/births_to_mothers_on_medicaid.xlsx"
         col_types <- c("text", "text", "numeric", "text", "numeric")

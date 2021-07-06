@@ -15,7 +15,8 @@ df <- bind_rows(breastfeeding(),
                 race_ethnic(),
                 smoking_mothers(),
                 teen_births(),
-                unmarried()
+                unmarried(),
+                very_low_birth_weight()
                 )
 
 ## 3.0  convert from long to wide top 20 by live births ----
