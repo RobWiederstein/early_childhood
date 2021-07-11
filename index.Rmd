@@ -21,7 +21,7 @@ output:
     source_code: embed
     includes:
       after_body: ./includes/footer.html
-  css: my-css-rules.css
+    css: my-css-rules.css
   bibliography: ./refs.bib
 ---
 
@@ -194,16 +194,20 @@ DT::datatable(df.1,
 
 ## Column {data-width=400}
 
-### State Rankings
+### State Gen. Fund Rankings Per Capita
 
 ```{r health-table}
 load("./data/tidy/state-rankings.Rdata")
+df.4 <- df.4 %>% 
+        mutate(pop = divide_by(pop, 1e6)) %>% 
+        rename(pop_mil = pop)
 library(DT)
 DT::datatable(df.4, 
               extensions = 'FixedColumns',
               class = 'compact stripe',
               rownames = F) %>% 
-  formatCurrency(columns = 5, digits = 2)
+  formatCurrency(columns = 5, digits = 2) %>% 
+  formatRound(columns = 4, digits = 1)
 ```
 
 
