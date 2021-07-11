@@ -373,7 +373,9 @@ theme_minimal()
 ## 10.2 Plot State General Healthcare Results
 df.3 <-
         df.1 %>%
-        dplyr::filter(variable == 'FTEXSGF' & dollars == 'wbi') %>%
+        dplyr::filter(variable == 'FTEXSGF') %>%
+        dplyr::filter(dollars == 'wbi') %>%
+        dplyr::filter(year %in% dput(range(df.1$year))) %>%
         mutate(per_cap = divide_by(value, pop))
 
 df.in <- df.3 %>% filter(stateabbrev == "IN")
@@ -416,13 +418,13 @@ caveats <- c("AK", "MN", "NH", "NM", "NY", "OH", "OK", "RI", "SC", "SD",
 df.4 <-
         df.3 %>%
         filter(year == max(year)) %>%
-        select(stateabbrev, year, pop, per_cap) %>%
+        select(stateabbrev, year, pop, per_cap, structure) %>%
         mutate(caveat = "no") %>%
         mutate(rank = dense_rank(desc(per_cap))) %>%
         rename(state = stateabbrev,
                per_cap_exp = per_cap) %>%
         arrange(rank) %>%
-        select(rank, state, year, pop, per_cap_exp, caveat)
+        select(rank, state, year, pop, per_cap_exp, structure,caveat)
 
 
 df.4$caveat[match(caveats, df.4$state)] <- "yes"
