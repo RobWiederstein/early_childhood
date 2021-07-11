@@ -15,21 +15,24 @@ output:
           family: Roboto Mono
           local: false
       font_scale: 1
-    css: my-css-rules.css
     mathjax: NULL
     orientation: columns
     vertical_layout: fill
     source_code: embed
     includes:
       after_body: ./includes/footer.html
+  css: my-css-rules.css
   bibliography: ./refs.bib
-
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(magrittr)
 library(dplyr)
+library(shiny)
+library(rmarkdown)
+library(widgetframe)
 # Install thematic and un-comment for themed static plots (i.e., ggplot2)
 # thematic::thematic_rmd()
 ```
@@ -41,6 +44,7 @@ df <- data.table::fread(input = input)
 rownames(df) <- df$location
 df.1 <- df %>% select(-location)
 ```
+
 
 # Maternal Health {data-icon="fas fa-child"}
 
@@ -100,8 +104,6 @@ hm_ec
 
 ### Correlogram
 
-hello
-
 ```{r correlogram-early-childhood}
 load("./data/tidy/cg_ec.Rdata")
 cg_ec
@@ -137,28 +139,78 @@ The "Correlogram" is a correlation matrix showing the relationship between the n
 
 # Public Health Funding
 
-## Column {data-width=600}
+```{r global, include=FALSE}
+load("./astho_health_care_exp_tot_per_capita")
+```
 
-### Chart
+## Column {data-width=600px}{.tabset}
+
+### Total Expenditures 
+
+```{r total-health-expenditures}
+library(ggplot2)
+library(plotly)
+p <- ggplot(dplyr::filter(df.2, dollars == "wbi"), aes(year, exp_per_cap, group = variable, color = variable)) +
+  geom_line() +
+  geom_point()+
+  scale_y_continuous(name = "",
+                     limits = c(0, 60),
+                     breaks = c(0, 15, 30, 45, 60),
+                     labels = c("$0", "$15", "$30", "$45", "$60")
+                     ) +
+  scale_x_continuous(name = "",
+                     breaks = seq(from = 2006, to = 2020, by = 2),
+                     labels = seq(from = 2006, to = 2020, by = 2)
+                     )+
+  theme_minimal()+
+  labs(title = "Total Health Department Expenditures",
+       subitle = "2008 to 2020",
+       caption = "Adj. for inflation",
+       color = "Source:")
+ggplotly(p)
+
+```
+
+### Indiana Health Dept. Expenditures {.tabset}
+
+```{r plot-state-general-funds-per-capita}
+load("./data/tidy/plot-state-general-funds-per-cap.Rdata")
+ggplotly(p)
+```
+
+
+### Caveats {.tabset}
+
+State health departments have varying structures,  responsibilities and funding streams,  making comparisons difficult.  
+
+```{r table-caveats}
+load("./data/tidy/fiscal_report_caveats.Rdata")
+DT::datatable(df.1,
+              extensions = "FixedColumns",
+              class = 'compact stripe',
+              rownames = F,)
+```
+
+
 
 ## Column {data-width=400}
 
-### Key Points
+### State Rankings
 
--  $3.6 trillion annually on health, less than 3 percent of that spending is directed toward public health and prevention.
+```{r health-table}
+load("./data/tidy/state-rankings.Rdata")
+library(DT)
+DT::datatable(df.4, 
+              extensions = 'FixedColumns',
+              class = 'compact stripe',
+              rownames = F) %>% 
+  formatCurrency(columns = 5, digits = 2)
+```
 
-- Public health spending as a proportion of total health spending has been decreasing since 2000 and falling in inflation-adjusted terms since the Great Recession.
 
-- U.S. Centers for Disease Control and Prevention (CDC) is the primary driver of federal public health funding through its grant programs to the states and large cities.
+### Citation  {data-height=100}
 
-- Most states (39) and the District of Columbia increased or maintained funding for public health budgets in FY 2019, but 11 states decreased such funding.
-
-[Trust for America's Health](https://www.tfah.org/report-details/publichealthfunding2020/)
-
-
-### Citation {data-height=150}
-
-Lasner, M. G. (2012). High Life: Condo Living in the Suburban Century. United Kingdom: Yale University Press.
+Association of State and Territorial Health Organizations Profile Survey of State and Territorial Public Health, United States, 2019. 
 
 # Notes {data-icon="fas fa-pen"}
 
