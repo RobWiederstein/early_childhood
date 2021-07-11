@@ -23,7 +23,6 @@ output:
       after_body: ./includes/footer.html
   css: my-css-rules.css
   bibliography: ./refs.bib
-runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
